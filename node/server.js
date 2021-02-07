@@ -26,20 +26,6 @@ app.post('/', jsonParser, (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('connected')
-
-  socket.on('test', (msg) => {
-    let buffer = Buffer.from(msg)
-    let str = buffer.toString('utf8')
-    try {
-      let json = JSON.parse(str)
-      console.log(json)
-      io.emit('meshes', json)
-    } catch (err) {
-      console.log(msg)
-      console.log(err)
-    }
-  })
-
   socket.on('disconnect', () => {
     console.log('disconnected')
   })

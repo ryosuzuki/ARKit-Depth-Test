@@ -7,14 +7,8 @@
 
 import RealityKit
 import ARKit
-import SocketIO
 
 let url = "http://10.0.0.68:3000"
-let manager = SocketManager(socketURL: URL(string: url)!, config: [.log(false), .compress])
-let socket = manager.defaultSocket
-
-var savedMeshes = Set<UUID>()
-var updatedMeshes = Dictionary<UUID, Int>()
 
 class ViewController: UIViewController, ARSessionDelegate {
     
@@ -26,13 +20,7 @@ class ViewController: UIViewController, ARSessionDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("Connect socket.io")
-        socket.connect()
         
-        socket.on("connect") { data, ack in
-            print("socket connected")
-        }
-
         print("AR start")
         arView.session.delegate = self
         
@@ -66,35 +54,35 @@ class ViewController: UIViewController, ARSessionDelegate {
         var z:Float
     }
 
-    struct Test2: Codable {
+    struct Mesh: Codable {
         var id:String
         var vertices:[Vector]
     }
     
-    struct Test3: Codable {
-        var meshes: [Test2]
+    struct Anchors: Codable {
+        var meshes: [Mesh]
     }
         
     func syncMesh(_ meshAnchors: [ARMeshAnchor]) {
-        var meshes:[Test2] = []
+        var meshes:[Mesh] = []
         for anchor in meshAnchors {
             let id = anchor.identifier.uuidString
-            var test2 = Test2(id: id, vertices: [])
+            var mesh = Mesh(id: id, vertices: [])
             for index in 0..<anchor.geometry.faces.count {
                 let vertices = anchor.geometry.verticesOf(faceWithIndex: index)
                 for vertex in vertices {
                     let v = Vector(x: vertex.0, y: vertex.1, z: vertex.2)
-                    test2.vertices.append(v)
+                    mesh.vertices.append(v)
                 }
             }
-            meshes.append(test2)
+            meshes.append(mesh)
         }
-        let test = Test3(meshes: meshes)
+        let test = Anchors(meshes: meshes)
         
         print("send")
-        let url = URL(string: "https://8e408a9ce710.ngrok.io")!
+        let requestURL = URL(string: url)!
         let session = URLSession.shared
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: requestURL)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
@@ -105,23 +93,11 @@ class ViewController: UIViewController, ARSessionDelegate {
         }
         let task = session.dataTask(with: request)
         task.resume()
-        
-//        do {
-//            print("send")
-//            let json = try JSONEncoder().encode(test)
-//            socket.emit("test", json)
-//        }
-//        catch {
-//            print("error")
-//        }
-
-
     }
 
     var count = 0
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         let position = frame.camera
-//        print(position)
         let meshAnchors = frame.anchors.compactMap{ $0 as? ARMeshAnchor }
         count += 1
         if (count > 100) {
@@ -149,6 +125,5 @@ class ViewController: UIViewController, ARSessionDelegate {
         print("hello")
         guard error is ARError else { return }
     }
-        
 
 }

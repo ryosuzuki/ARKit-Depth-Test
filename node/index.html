@@ -15,9 +15,7 @@
       entities = []
       let scene = document.querySelector('a-scene')
 
-      // console.log(data)
       let meshes = data.meshes
-      // console.log(data)
       geometries = []
       for (let i = 0; i < meshes.length; i++) {
         let mesh = meshes[i]
@@ -34,7 +32,7 @@
         }
         geometries.push(geometry)
       }
-      // console.log(geometry)
+
       for (let i = 0; i < geometries.length; i++) {
         let geometry = geometries[i]
         let material = new THREE.MeshBasicMaterial({
@@ -42,38 +40,15 @@
           wireframe: true
         })
         let mesh = new THREE.Mesh(geometry, material)
-        // let entity = document.getElementById(i)
         let entity = document.createElement('a-entity')
         entity.setObject3D('mesh', mesh)
         entities.push(entity)
         let parent = document.querySelector('#parent')
         parent.appendChild(entity)
         console.log(mesh)
-        // scene.appendChild(entity)
       }
     })
 
-    /*
-    AFRAME.registerComponent('mesh-geometry', {
-      tick: function() {
-        for (let entity of entities) {
-          entity.parentNode.removeChild(entity)
-        }
-        entities = []
-        // console.log(geometries)
-        for (let geometry of geometries) {
-          var mesh = new THREE.Mesh(geometry)
-          // console.log(mesh)
-          let entity = document.createElement('a-entity')
-          entity.setObject3D('mesh', mesh)
-          entity.setAttribute('position', '0 0 -4')
-          entity.setAttribute('material', 'color', 'crimson')
-          this.el.sceneEl.appendChild(entity)
-          entities.push(entity)
-        }
-      }
-    })
-    */
   </script>
 </head>
 <body>
