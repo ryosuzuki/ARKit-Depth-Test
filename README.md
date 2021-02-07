@@ -8,3 +8,4 @@
 - [x] Receive data in node.js
 - [x] Get mesh data
 - [x] Send and receive mesh data
+- [ ] Reconstruct mesh data on the web

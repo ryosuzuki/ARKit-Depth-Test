@@ -2,15 +2,82 @@
 <html>
 <head>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.js'></script>
+  <script src="https://aframe.io/releases/1.1.0/aframe.min.js"></script>
   <script>
     const socket = io()
+    let geometries = []
+    let geometry = new THREE.Geometry()
     socket.emit('test', 'test from browser')
     socket.on('vertices', (data) => {
-      console.log(data)
+      // console.log(data)
+      let meshes = data.meshes
+      // console.log(data)
+      geometries = []
+      for (let i = 0; i < meshes.length; i++) {
+        let mesh = meshes[i]
+        let vertices = mesh.vertices
+        let geometry = new THREE.Geometry()
+        for (let i = 0; i < vertices.length/3; i++) {
+          let v0 = vertices[i*3]
+          let v1 = vertices[i*3+1]
+          let v2 = vertices[i*3+2]
+          geometry.vertices.push(v0)
+          geometry.vertices.push(v1)
+          geometry.vertices.push(v2)
+          geometry.faces.push(new THREE.Face3(i*3, i*3+1, i*3+2))
+        }
+        geometries.push(geometry)
+      }
+      // console.log(geometry)
+      for (let i = 0; i < geometries.length; i++) {
+        let geometry = geometries[i]
+        let material = new THREE.MeshBasicMaterial({
+          color: 'crimson',
+          wireframe: true
+        })
+        let mesh = new THREE.Mesh(geometry, material)
+        let entity = document.getElementById(i)
+        entity.setObject3D('mesh', mesh)
+        console.log(entity)
+        // scene.appendChild(entity)
+      }
     })
+
+    let entities = []
+    /*
+    AFRAME.registerComponent('mesh-geometry', {
+      tick: function() {
+        for (let entity of entities) {
+          entity.parentNode.removeChild(entity)
+        }
+        entities = []
+        // console.log(geometries)
+        for (let geometry of geometries) {
+          var mesh = new THREE.Mesh(geometry)
+          // console.log(mesh)
+          let entity = document.createElement('a-entity')
+          entity.setObject3D('mesh', mesh)
+          entity.setAttribute('position', '0 0 -4')
+          entity.setAttribute('material', 'color', 'crimson')
+          this.el.sceneEl.appendChild(entity)
+          entities.push(entity)
+        }
+      }
+    })
+    */
   </script>
 </head>
 <body>
-
+  <a-scene background="color: #FAFAFA">
+    <a-entity position="0 0 -2">
+      <a-entity id="0"></a-entity>
+      <a-entity id="1"></a-entity>
+      <a-entity id="2"></a-entity>
+      <a-entity id="3"></a-entity>
+      <a-entity id="4"></a-entity>
+      <a-entity id="5"></a-entity>
+    </a-entity>
+    <a-plane static-body position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
+  </a-scene>
 </body>
 </html>

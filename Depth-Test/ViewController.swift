@@ -92,23 +92,41 @@ class ViewController: UIViewController, ARSessionDelegate {
         var vertices:[Vector]
     }
     
+    struct Test3: Codable {
+        var meshes: [Test2]
+    }
+    
     func syncMesh(_ meshAnchors: [ARMeshAnchor]) {
+        var meshes:[Test2] = []
         for anchor in meshAnchors {
             let id = anchor.identifier.uuidString
-            var test = Test2(id: id, vertices: [])
+            var test2 = Test2(id: id, vertices: [])
+            /*
             for index in 0..<anchor.geometry.vertices.count {
                 let vertex = anchor.geometry.vertex(at: UInt32(index))
                 let v = Vector(x: vertex.0, y: vertex.1, z: vertex.2)
                 test.vertices.append(v)
             }
-            do {
-                let json = try JSONEncoder().encode(test)
-                socket.emit("test", json)
+            */
+            for index in 0..<anchor.geometry.faces.count {
+                let vertices = anchor.geometry.verticesOf(faceWithIndex: index)
+                for vertex in vertices {
+                    let v = Vector(x: vertex.0, y: vertex.1, z: vertex.2)
+                    test2.vertices.append(v)
+                }
             }
-            catch {
-                print("error")
-            }
+            meshes.append(test2)
         }
+        var test = Test3(meshes: meshes)
+        do {
+            let json = try JSONEncoder().encode(test)
+            socket.emit("test", json)
+        }
+        catch {
+            print("error")
+        }
+
+
     }
 
     func session(_ session: ARSession, didUpdate frame: ARFrame) {

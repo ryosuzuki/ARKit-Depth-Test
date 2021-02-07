@@ -14,8 +14,8 @@ io.on('connection', (socket) => {
     let str = buffer.toString('utf8')
     try {
       let json = JSON.parse(str)
-      console.log(json.length)
-      io.emit('vertices', json)
+      console.log(json)
+      io.emit('meshes', json)
     } catch (err) {
       console.log(err)
     }
