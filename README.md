@@ -1,8 +1,9 @@
 # ARKit-Depth-Test
 
-- [x] Initial ARKit Test 
-- [x] Access depth data 
-- [x] Mesh reconstruction demo 
+- [x] Create git repo and init - 6:00pm 
+- [x] Initial ARKit Test - 6:20pm
+- [x] Access depth data - 6:30pm 
+- [x] Mesh reconstruction demo - 6:30pm
 - [ ] Get mesh data 
 - [ ] Get surface data 
 - [ ] Send surface data to web
