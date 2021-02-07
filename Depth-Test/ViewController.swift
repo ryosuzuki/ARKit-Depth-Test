@@ -13,6 +13,9 @@ let url = "https://bddee3dec219.ngrok.io"
 let manager = SocketManager(socketURL: URL(string: url)!, config: [.log(true), .compress])
 let socket = manager.defaultSocket
 
+var savedMeshes = Set<UUID>()
+var updatedMeshes = Dictionary<UUID, Int>()
+
 class ViewController: UIViewController, ARSessionDelegate {
     
     @IBOutlet var arView: ARView!
@@ -24,8 +27,13 @@ class ViewController: UIViewController, ARSessionDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         print("Connect socket.io")
-        socket.connect()
         socket.emit("test", "test")
+        socket.connect()
+        
+        socket.on("connect") { data, ack in
+            print("socket connected")
+            socket.emit("test", "test 2")
+        }
 
         print("AR start")
         arView.session.delegate = self
@@ -44,16 +52,160 @@ class ViewController: UIViewController, ARSessionDelegate {
 
         configuration.environmentTexturing = .automatic
         arView.session.run(configuration)
-        
-        guard let frame = arView.session.currentFrame else { return }
-        var meshAnchors = frame.anchors.compactMap{ $0 as? ARMeshAnchor }
-        for meshAnchor in meshAnchors {
-            print(meshAnchor.geometry.normals.offset)
-        }
                 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         arView.addGestureRecognizer(tapRecognizer)
     }
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        print("test")
+        let session = arView.session
+        let frame = session.currentFrame
+        let position = frame?.camera
+    }
+    
+    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+        let meshAnchors = anchors.compactMap({ $0 as? ARMeshAnchor })
+        addMeshAnchors(meshAnchors)
+    }
+
+    struct Vertex: Codable {
+        var x:Float
+        var y:Float
+        var z:Float
+    }
+    
+//    struct Test: Codable {
+//        var geometry: ARMeshGeometry
+//    }
+    
+    struct Vector: Codable {
+        var x:Float
+        var y:Float
+        var z:Float
+    }
+
+//    struct Vertex:[Float]
+    
+    struct Test2: Codable {
+        var id:String
+        var vertices:[Vector]
+    }
+    
+    func syncMesh(_ meshAnchors: [ARMeshAnchor]) {
+        for anchor in meshAnchors {
+            let id = anchor.identifier.uuidString
+            var test = Test2(id: id, vertices: [])
+            for index in 0..<anchor.geometry.vertices.count {
+                let vertex = anchor.geometry.vertex(at: UInt32(index))
+                let v = Vector(x: vertex.0, y: vertex.1, z: vertex.2)
+                test.vertices.append(v)
+            }
+            do {
+                let json = try JSONEncoder().encode(test)
+                socket.emit("test", json)
+            }
+            catch {
+                print("error")
+            }
+        }
+    }
+
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        let position = frame.camera
+//        print(position)
+        let meshAnchors = frame.anchors.compactMap{ $0 as? ARMeshAnchor }
+        DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + 0.0) {
+            self.syncMesh(meshAnchors)
+        }
+//        print(meshAnchors.count)
+
+//        addMeshAnchors(meshAnchors)
+//        updateMeshAnchors(meshAnchors)
+
+//        for meshAnchor in meshAnchors {
+//            print(meshAnchor.geometry.vertices.count)
+//        }
+
+//        do {
+//            let data = try JSONEncoder().encode(position)
+//            socket.emit("test", data)
+//        }
+    }
+    
+    func addMeshAnchors(_ meshAnchors: [ARMeshAnchor]) {
+        for anchor in meshAnchors {
+            updatedMeshes[anchor.identifier] = 0
+        }
+    }
+    
+    func updateMeshAnchors(_ meshAnchors: [ARMeshAnchor]) {
+        for (id, value) in updatedMeshes {
+            updatedMeshes[id] = value + 1
+        }
+        for anchor in meshAnchors {
+            updatedMeshes[anchor.identifier] = 0
+        }
+        print(updatedMeshes.count)
+        guard let currentMeshAnchors = arView.session.currentFrame?.anchors.compactMap({ $0 as? ARMeshAnchor }) else { return }
+        
+        for (id, value) in updatedMeshes {
+//            guard value >= meshMaxUpdateCount else { continue }
+            
+            if let anchor = currentMeshAnchors.first(where: {$0.identifier == id}) {
+                savedMeshes.insert(id)
+                updatedMeshes.removeValue(forKey: id)
+                let meshSaveDelay = 1000
+                /*
+                DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + meshSaveDelay) {
+                    self.saveMeshAsJSON(anchor, self.extractAnchorToMesh)
+                }
+                */
+                print(anchor)
+            }
+        }
+    }
+    
+    /*
+    struct ScannedMesh {
+        var
+        var vertices: [SCNVector3]
+        var normals: [SCNVector3]
+    }
+    
+    func extractAnchorToMesh(_ anchor:ARMeshAnchor) -> ScannedMesh {
+        var scannedMesh = ScannedMesh(transform: anchor.transform.floatArray, triangles:[], vertices: [], normals: [])
+        for index in 0..<anchor.geometry.vertices.count {
+            let vertex = anchor.geometry.transformedVertex(index, anchor.transform)
+            scannedMesh.vertices.append(Vector3(x: vertex.x, y: vertex.y, z: vertex.z))
+        }
+        for index in 0..<anchor.geometry.normals.count {
+            let normal = anchor.geometry.normalOf(faceWithIndex: index)
+            scannedMesh.normals.append(Vector3(x: normal.x, y: normal.y, z: normal.z))
+        }
+        for index in 0..<anchor.geometry.faces.count {
+            let triangle = anchor.geometry.vertexIndicesOf(faceWithIndex: index)
+            let classificationId = anchor.geometry.classificationOf(faceWithIndex: index).rawValue
+            if let index = scannedMesh.triangles.firstIndex(where: { return $0.id == classificationId }) {
+                scannedMesh.triangles[index].value += triangle
+            }
+            else {
+                scannedMesh.triangles.append(ClassifiedTriangle(id: classificationId, value: triangle))
+            }
+        }
+        return scannedMesh
+    }
+    
+    func saveMeshAsJSON(_ anchor:ARMeshAnchor, _ func:(ARMeshAnchor) -> ScannedMesh) {
+        do {
+            let data = try JSONEncoder().encode(func(anchor))
+            data.saveToDirectory(getMeshFolderName(), getMeshFileName(anchor.identifier)) {}
+        }
+        catch {
+            print("Failed to encode JSON: \(error.localizedDescription)")
+        }
+    }
+    */
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)

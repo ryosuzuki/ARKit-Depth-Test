@@ -10,7 +10,15 @@ io.on('connection', (socket) => {
   console.log('connected')
 
   socket.on('test', (msg) => {
-    console.log(msg)
+    let buffer = Buffer.from(msg)
+    let str = buffer.toString('utf8')
+    try {
+      let json = JSON.parse(str)
+      console.log(json.length)
+      io.emit('vertices', json)
+    } catch (err) {
+      console.log(err)
+    }
   })
 
   socket.on('disconnect', () => {

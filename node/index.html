@@ -5,6 +5,9 @@
   <script>
     const socket = io()
     socket.emit('test', 'test from browser')
+    socket.on('vertices', (data) => {
+      console.log(data)
+    })
   </script>
 </head>
 <body>
