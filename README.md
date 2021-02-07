@@ -8,4 +8,8 @@
 - [x] Receive data in node.js
 - [x] Get mesh data
 - [x] Send and receive mesh data
-- [ ] Reconstruct mesh data on the web
+- [x] Reconstruct mesh data on the web
+- [x] Use http post instead of websocket
+- [x] Finish proof-of-concept prototype
+- [ ] Check the position/trasform of mesh
+- [ ] Label classification (wall, table, etc)

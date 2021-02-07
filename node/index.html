@@ -7,8 +7,14 @@
     const socket = io()
     let geometries = []
     let geometry = new THREE.Geometry()
-    socket.emit('test', 'test from browser')
-    socket.on('vertices', (data) => {
+    let entities = []
+    socket.on('meshes', (data) => {
+      for (let entity of entities) {
+        entity.parentNode.removeChild(entity)
+      }
+      entities = []
+      let scene = document.querySelector('a-scene')
+
       // console.log(data)
       let meshes = data.meshes
       // console.log(data)
@@ -36,14 +42,17 @@
           wireframe: true
         })
         let mesh = new THREE.Mesh(geometry, material)
-        let entity = document.getElementById(i)
+        // let entity = document.getElementById(i)
+        let entity = document.createElement('a-entity')
         entity.setObject3D('mesh', mesh)
-        console.log(entity)
+        entities.push(entity)
+        let parent = document.querySelector('#parent')
+        parent.appendChild(entity)
+        console.log(mesh)
         // scene.appendChild(entity)
       }
     })
 
-    let entities = []
     /*
     AFRAME.registerComponent('mesh-geometry', {
       tick: function() {
@@ -69,14 +78,7 @@
 </head>
 <body>
   <a-scene background="color: #FAFAFA">
-    <a-entity position="0 0 -2">
-      <a-entity id="0"></a-entity>
-      <a-entity id="1"></a-entity>
-      <a-entity id="2"></a-entity>
-      <a-entity id="3"></a-entity>
-      <a-entity id="4"></a-entity>
-      <a-entity id="5"></a-entity>
-    </a-entity>
+    <a-entity id="parent" position="0 0.5 -4"></a-entity>
     <a-plane static-body position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
   </a-scene>
 </body>
