@@ -18,8 +18,8 @@
 # How to use
 What you need to do is
 - clone the repo
-- check your IP with "System Preferences > Network > Wi-Fi is connected to XXX and has the IP address 10.0.0.68."
-- modify let url = "http://10.0.0.68:3000" to your IP in XCode at `ViewController.swift`
+- check your IP with "System Preferences > Network > Wi-Fi is connected to XXX and has the IP address XX.XX.XX.XX."
+- modify `let url = "http://10.0.0.68:3000"` to your IP in XCode at `ViewController.swift`
 - build and deploy to iPhone 12 or iPad Pro
 - `npm install` and `node server.js`
 - open http://localhost:3000 in your browser
