@@ -13,6 +13,7 @@
 		0D5E871125CF7181009D8FEC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0D5E870F25CF7181009D8FEC /* Main.storyboard */; };
 		0D5E871325CF7182009D8FEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D5E871225CF7182009D8FEC /* Assets.xcassets */; };
 		0D5E871625CF7182009D8FEC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0D5E871425CF7182009D8FEC /* LaunchScreen.storyboard */; };
+		0D5E871F25CF78CE009D8FEC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D5E871E25CF78CE009D8FEC /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		0D5E871225CF7182009D8FEC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0D5E871525CF7182009D8FEC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0D5E871725CF7182009D8FEC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0D5E871E25CF78CE009D8FEC /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 			children = (
 				0D5E870925CF7181009D8FEC /* AppDelegate.swift */,
 				0D5E870B25CF7181009D8FEC /* ViewController.swift */,
+				0D5E871E25CF78CE009D8FEC /* Extensions.swift */,
 				0D5E870D25CF7181009D8FEC /* Experience.rcproject */,
 				0D5E870F25CF7181009D8FEC /* Main.storyboard */,
 				0D5E871225CF7182009D8FEC /* Assets.xcassets */,
@@ -140,6 +143,7 @@
 				0D5E870C25CF7181009D8FEC /* ViewController.swift in Sources */,
 				0D5E870A25CF7181009D8FEC /* AppDelegate.swift in Sources */,
 				0D5E870E25CF7181009D8FEC /* Experience.rcproject in Sources */,
+				0D5E871F25CF78CE009D8FEC /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,7 +220,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -271,7 +275,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
