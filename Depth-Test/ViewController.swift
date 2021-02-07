@@ -7,6 +7,11 @@
 
 import RealityKit
 import ARKit
+import SocketIO
+
+let url = "https://bddee3dec219.ngrok.io"
+let manager = SocketManager(socketURL: URL(string: url)!, config: [.log(true), .compress])
+let socket = manager.defaultSocket
 
 class ViewController: UIViewController, ARSessionDelegate {
     
@@ -18,7 +23,11 @@ class ViewController: UIViewController, ARSessionDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("Connect socket.io")
+        socket.connect()
+        socket.emit("test", "test")
+
+        print("AR start")
         arView.session.delegate = self
         
         arView.environment.sceneUnderstanding.options = []
@@ -36,6 +45,12 @@ class ViewController: UIViewController, ARSessionDelegate {
         configuration.environmentTexturing = .automatic
         arView.session.run(configuration)
         
+        guard let frame = arView.session.currentFrame else { return }
+        var meshAnchors = frame.anchors.compactMap{ $0 as? ARMeshAnchor }
+        for meshAnchor in meshAnchors {
+            print(meshAnchor.geometry.normals.offset)
+        }
+                
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         arView.addGestureRecognizer(tapRecognizer)
     }
@@ -66,6 +81,7 @@ class ViewController: UIViewController, ARSessionDelegate {
     
     
     func session(_ session: ARSession, didFailWithError error: Error) {
+        print("hello")
         guard error is ARError else { return }
     }
         
