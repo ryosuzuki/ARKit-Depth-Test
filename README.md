@@ -6,5 +6,5 @@
 - [x] Mesh reconstruction demo
 - [x] Send data via websocket
 - [x] Receive data in node.js
-- [ ] Get mesh data
-- [ ] Get surface data
+- [x] Get mesh data
+- [x] Send and receive mesh data
