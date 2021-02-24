@@ -8,14 +8,48 @@
     let geometries = []
     let geometry = new THREE.Geometry()
     let entities = []
-    socket.on('meshes', (data) => {
+    socket.on('json', (data) => {
+      // console.log(data)
+
+      if (data.meshes) {
+        let anchors = data
+        updateAnchors(anchors)
+      }
+      if (data.position) {
+        let camera = data
+        updateCamera(camera)
+      }
+    })
+
+    function updateCamera(camera) {
+      let sphere = document.querySelector('#camera-point')
+      sphere.setAttribute('position', camera.position)
+
+      let cameraEl = document.querySelector('a-camera')
+      // cameraEl.setAttribute('look-controls','false');
+      // cameraEl.setAttribute('position', camera.position)
+      cameraEl.object3D.position.set(
+        camera.position.x,
+        camera.position.y + 1.0,
+        camera.position.z
+      )
+      cameraEl.object3D.rotation.set(
+        camera.rotation.x,
+        camera.rotation.y,
+        camera.rotation.z
+      )
+      // console.log(sphere)
+    }
+
+    function updateAnchors(anchors) {
       for (let entity of entities) {
         entity.parentNode.removeChild(entity)
       }
       entities = []
       let scene = document.querySelector('a-scene')
 
-      let meshes = data.meshes
+      let meshes = anchors.meshes
+      console.log(meshes)
       geometries = []
       for (let i = 0; i < meshes.length; i++) {
         let mesh = meshes[i]
@@ -45,15 +79,16 @@
         entities.push(entity)
         let parent = document.querySelector('#parent')
         parent.appendChild(entity)
-        console.log(mesh)
       }
-    })
+    }
 
   </script>
 </head>
 <body>
   <a-scene background="color: #FAFAFA">
-    <a-entity id="parent" position="0 0.5 -4"></a-entity>
+    <a-entity id="parent"></a-entity>
+    <a-camera look-controls-enabled="false"></a-camera>
+    <a-sphere id="camera-point" radius="0.03" color="blue"></a-sphere>
     <a-plane static-body position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
   </a-scene>
 </body>

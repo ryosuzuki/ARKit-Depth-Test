@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 
 app.use(bodyParser.json({
-  limit: '50mb'
+  limit: '500mb'
 }))
 
 app.get('/', (req, res) => {
@@ -14,10 +14,10 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', jsonParser, (req, res) => {
-  console.log(req.body)
+  // console.log(req.body)
   try {
     const json = req.body
-    io.sockets.emit('meshes', json)
+    io.sockets.emit('json', json)
   } catch (err) {
     console.log(err)
   }
